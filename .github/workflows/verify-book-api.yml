@@ -1,0 +1,44 @@
+name: Verify Book Review API
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'final_project/evidence/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: final_project
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: final_project/package-lock.json
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run API tests
+        run: npm test
+      - name: Start API and capture actual curl responses
+        run: |
+          node index.js > server.log 2>&1 &
+          echo $! > server.pid
+          sleep 3
+          bash scripts/generate_evidence.sh
+          node async_demo.js > evidence/axios-async-demo.txt
+          test -s evidence/getallbooks.txt
+          test -s evidence/reviewadded.txt
+          test -s evidence/deletereview.txt
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: book-review-curl-evidence
+          path: final_project/evidence/
