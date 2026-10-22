@@ -28,7 +28,7 @@ capture getbooksbytitle "$BASE_URL/title/Pride%20and%20Prejudice"
 capture getbookreview "$BASE_URL/review/1"
 capture register -H "Content-Type: application/json" -d "{\"username\":\"$USER_NAME\",\"password\":\"$PASSWORD\"}" "$BASE_URL/register"
 capture login -c "$COOKIE" -b "$COOKIE" -H "Content-Type: application/json" -d "{\"username\":\"$USER_NAME\",\"password\":\"$PASSWORD\"}" "$BASE_URL/customer/login"
-capture reviewadded -c "$COOKIE" -b "$COOKIE" -X PUT --data-urlencode "review=Great book" "$BASE_URL/customer/auth/review/1"
+capture reviewadded -c "$COOKIE" -b "$COOKIE" -X PUT "$BASE_URL/customer/auth/review/1?review=Great%20book"
 capture deletereview -c "$COOKIE" -b "$COOKIE" -X DELETE "$BASE_URL/customer/auth/review/1"
 
 {
