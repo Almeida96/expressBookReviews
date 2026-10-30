@@ -1,27 +1,27 @@
 const express = require('express');
 const axios = require('axios');
 const books = require('./booksdb.js');
-const { isValid, users } = require('./auth_users.js');
+const accounts = require('../accounts');
 const public_users = express.Router();
 
 // Public book and account routes
-public_users.post('/register', (req, res) => {
+public_users.post('/register', async (req, res, next) => {
   const { username, password } = req.body || {};
   if (typeof username !== 'string' || typeof password !== 'string' ||
       !username.trim() || !password) {
     return res.status(400).json({ message: 'Username and password are required' });
   }
-  if (isValid(username)) {
-    return res.status(409).json({ message: 'Username already exists' });
-  }
-  users.push({ username, password });
-  return res.status(201).json({ message: 'User successfully registered' });
+  try {
+    const status = await accounts.register(username, password);
+    const messages = { 201: 'User successfully registered', 400: 'Invalid username or password format', 409: 'Username already exists', 503: 'Account limit reached' };
+    return res.status(status).json({ message: messages[status] });
+  } catch (error) { next(error); }
 });
 
 public_users.get('/', (req, res) => res.status(200).json(books));
 
 public_users.get('/isbn/:isbn', (req, res) => {
-  const book = books[req.params.isbn];
+  const book = Object.hasOwn(books, req.params.isbn) ? books[req.params.isbn] : null;
   return book
     ? res.status(200).json(book)
     : res.status(404).json({ message: 'Book not found' });
@@ -44,7 +44,7 @@ public_users.get('/title/:title', (req, res) => {
 });
 
 public_users.get('/review/:isbn', (req, res) => {
-  const book = books[req.params.isbn];
+  const book = Object.hasOwn(books, req.params.isbn) ? books[req.params.isbn] : null;
   return book
     ? res.status(200).json(book.reviews)
     : res.status(404).json({ message: 'Book not found' });
@@ -52,7 +52,7 @@ public_users.get('/review/:isbn', (req, res) => {
 
 // Assignment task 11: the four asynchronous Axios functions.
 // Run final_project/async_demo.js to exercise them against the running server.
-const api = axios.create({ baseURL: process.env.BOOKS_API_URL || 'http://localhost:5000' });
+const api = axios.create({ baseURL: process.env.BOOKS_API_URL || 'http://localhost:5000', timeout: 5000 });
 
 function getAllBooks() {
   return new Promise((resolve, reject) => {

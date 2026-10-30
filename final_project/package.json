@@ -9,7 +9,8 @@
     "dev": "nodemon index.js",
     "test": "node --test"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
+  "engines": { "node": ">=22" },
   "dependencies": {
     "axios": "^1.7.9",
     "express": "^4.21.2",

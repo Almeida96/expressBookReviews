@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - 'final_project/evidence/**'
   workflow_dispatch:
+  pull_request:
 
 permissions:
   contents: read
@@ -22,7 +23,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Run API tests
         run: npm test
       - name: Start API and capture actual curl responses
