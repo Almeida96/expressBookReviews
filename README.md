@@ -55,6 +55,8 @@ This remains a local course demo: there is no durable database, password reset, 
 
 ## Development
 
+Run `npm run dev` to restart the server when source files change. It uses Node's built-in watch mode and requires no separate watcher package.
+
 `npm test` exercises the real HTTP routes with a temporary port, including malformed input and authentication boundaries. `node async_demo.js` demonstrates the four Axios course tasks against a running server; `BOOKS_API_URL` overrides the address. Requests time out after five seconds.
 
 [Course evidence instructions](final_project/README.md) · [Apache 2.0 license](LICENSE)
